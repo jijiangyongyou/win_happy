@@ -11,16 +11,9 @@ def get_datas():
         mydatas = yaml.safe_load(f)
         adddatas = mydatas['add']['datas']
         myids = mydatas['add']['myids']
-    return [adddatas, myids]
-
-# 读取div测试数据
-def get_datas_div():
-    with open('./datas/calc.yml', encoding='utf-8') as f:
-        mydatas = yaml.safe_load(f)
         adddatas_div = mydatas['div']['datas_div']
         myids_div = mydatas['div']['myids_div']
-    return [adddatas_div, myids_div]
-
+    return [adddatas, myids, adddatas_div, myids_div]
 
 class TestCalc:
     def setup_class(self):
@@ -40,8 +33,10 @@ class TestCalc:
         result = round(self.calc.add(a, b), 2)
         # result = self.calc.add(a, b)
         assert expect == result
+        print(get_datas()[0])
 
-    @pytest.mark.parametrize('a,b,expect', get_datas_div()[0], ids=get_datas_div()[1])
+
+    @pytest.mark.parametrize('a,b,expect', get_datas()[2], ids=get_datas()[3])
 
     def test_div(self, a, b, expect):
         try:
@@ -49,3 +44,4 @@ class TestCalc:
             assert expect == result
         except ZeroDivisionError:
             print('被除数不能为零')
+            print(get_datas()[2])
