@@ -1,7 +1,15 @@
 from time import sleep
 
+import pytest
+import yaml
 from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
+
+
+def get_contact():
+    with open("./datas/contacts.yml") as f:
+        datas = yaml.safe_load(f)
+    return datas
 
 
 class TestDemo:
@@ -21,7 +29,12 @@ class TestDemo:
     def teardown(self):
         self.driver.quit()
 
-    def test_addcontact(self):
+
+
+
+
+    @pytest.mark.parametrize('name,gender,phonenum', get_contact())
+    def test_addcontact(self, name, gender, phonenum):
         '''
         企业微信：添加联系人测试用例
         前提条件
@@ -35,9 +48,6 @@ class TestDemo:
             6、点击【保存】
             7、验证保存成功
         '''
-        name = "个子"
-        gender = '男'
-        phonenum = "13960990004"
 
         self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
         self.driver.find_element(MobileBy.ANDROID_UIAUTOMATOR,
@@ -64,23 +74,3 @@ class TestDemo:
         toasttext = self.driver.find_element(MobileBy.XPATH, "//*[@class='android.widget.Toast']").text
         assert '添加成功' == toasttext
 
-    def test_delcontact(self):
-        name = '小个子'
-        self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
-        self.driver.find_element(MobileBy.ID, 'com.tencent.wework:id/guu').click()
-        self.driver.find_element(MobileBy.ID, 'com.tencent.wework:id/fk1').send_keys(name)
-        sleep(2)
-        eles = self.driver.find_elements(MobileBy.XPATH, f"//*[@text='{name}']")
-        searchnum = len(eles)
-        if searchnum < 2:
-            print('没有可删除的人员')
-            return
-        eles[1].click()
-        self.driver.find_element(MobileBy.ID, 'com.tencent.wework:id/guk').click()
-        self.driver.find_element(MobileBy.ID, 'com.tencent.wework:id/azd').click()
-        self.driver.find_element(MobileBy.ID,'com.tencent.wework:id/duq').click()
-        sleep(2)
-        self.driver.find_element(MobileBy.ID, 'com.tencent.wework:id/b_4').click()
-        eles1 = self.driver.find_elements(MobileBy.XPATH, f"//*[@text='{name}']")
-        searchnum1 = len(eles1)
-        assert searchnum1 == searchnum - 1
